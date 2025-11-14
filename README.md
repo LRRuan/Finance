@@ -5,7 +5,7 @@
 - `a-share-mcp-is-just-i-need/`：通过 MCP 协议暴露的 A 股数据服务  
 - `Fin-R1* / qwen_* / nasdaq_*`：需要手动下载的模型与数据资源
 
-> ⚠️ GitHub 版本仅包含核心源码（主要是 `src/main.py` 与 `mcp_server.py`），**训练数据与模型权重均需自行下载并放置到对应目录**。
+> ⚠️ GitHub 版本仅包含核心源码，**训练数据与模型权重均需自行下载并放置到对应目录**。
 
 ---
 
@@ -77,3 +77,4 @@ Finance/
 - 执行日志输出至 `Financial-MCP-Agent/logs/`
 
 ---
+
