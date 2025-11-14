@@ -24,54 +24,54 @@ logger = logging.getLogger(__name__)
 lock_file_path = "/tmp/baostock.lock" # 使用 /tmp 目录，所有进程都有权限
 baostock_process_lock = FileLock(lock_file_path, timeout=10) # 设置10秒超时
 # --- Baostock上下文管理器 ---
-@contextmanager
-def baostock_login_context():
-    """上下文管理器，处理Baostock登录和登出，抑制标准输出消息"""
-    with baostock_process_lock:
-        logger.info(f"Process {os.getpid()} acquired Baostock lock.")
-        # 重定向标准输出以抑制登录/登出消息
-        original_stdout_fd = sys.stdout.fileno()
-        saved_stdout_fd = os.dup(original_stdout_fd)
-        devnull_fd = os.open(os.devnull, os.O_WRONLY)
-
-        os.dup2(devnull_fd, original_stdout_fd)
-        os.close(devnull_fd)
-
-        logger.debug("Attempting Baostock login...")
-        lg = bs.login()
-        logger.debug(f"Login result: code={lg.error_code}, msg={lg.error_msg}")
-
-        # 恢复标准输出
-        os.dup2(saved_stdout_fd, original_stdout_fd)
-        os.close(saved_stdout_fd)
-
-        if lg.error_code != '0':
-            # 在抛出异常前记录错误
-            logger.error(f"Baostock login failed: {lg.error_msg}")
-            raise LoginError(f"Baostock login failed: {lg.error_msg}")
-
-        logger.info("Baostock login successful.")
-        try:
-            yield  # API调用在这里进行
-        finally:
-            with baostock_process_lock:
-                logger.info(f"Process {os.getpid()} acquired Baostock lock.")
-                # 再次重定向标准输出以进行登出
-                original_stdout_fd = sys.stdout.fileno()
-                saved_stdout_fd = os.dup(original_stdout_fd)
-                devnull_fd = os.open(os.devnull, os.O_WRONLY)
-
-                os.dup2(devnull_fd, original_stdout_fd)
-                os.close(devnull_fd)
-
-                logger.debug("Attempting Baostock logout...")
-                bs.logout()
-                logger.debug("Logout completed.")
-
-                # 恢复标准输出
-                os.dup2(saved_stdout_fd, original_stdout_fd)
-                os.close(saved_stdout_fd)
-                logger.info("Baostock logout successful.")
+# @contextmanager
+# def baostock_login_context():
+#     """上下文管理器，处理Baostock登录和登出，抑制标准输出消息"""
+#     with baostock_process_lock:
+#         logger.info(f"Process {os.getpid()} acquired Baostock lock.")
+#         # 重定向标准输出以抑制登录/登出消息
+#         original_stdout_fd = sys.stdout.fileno()
+#         saved_stdout_fd = os.dup(original_stdout_fd)
+#         devnull_fd = os.open(os.devnull, os.O_WRONLY)
+#
+#         os.dup2(devnull_fd, original_stdout_fd)
+#         os.close(devnull_fd)
+#
+#         logger.debug("Attempting Baostock login...")
+#         lg = bs.login()
+#         logger.debug(f"Login result: code={lg.error_code}, msg={lg.error_msg}")
+#
+#         # 恢复标准输出
+#         os.dup2(saved_stdout_fd, original_stdout_fd)
+#         os.close(saved_stdout_fd)
+#
+#         if lg.error_code != '0':
+#             # 在抛出异常前记录错误
+#             logger.error(f"Baostock login failed: {lg.error_msg}")
+#             raise LoginError(f"Baostock login failed: {lg.error_msg}")
+#
+#         logger.info("Baostock login successful.")
+#         try:
+#             yield  # API调用在这里进行
+#         finally:
+#             with baostock_process_lock:
+#                 logger.info(f"Process {os.getpid()} acquired Baostock lock.")
+#                 # 再次重定向标准输出以进行登出
+#                 original_stdout_fd = sys.stdout.fileno()
+#                 saved_stdout_fd = os.dup(original_stdout_fd)
+#                 devnull_fd = os.open(os.devnull, os.O_WRONLY)
+#
+#                 os.dup2(devnull_fd, original_stdout_fd)
+#                 os.close(devnull_fd)
+#
+#                 logger.debug("Attempting Baostock logout...")
+#                 bs.logout()
+#                 logger.debug("Logout completed.")
+#
+#                 # 恢复标准输出
+#                 os.dup2(saved_stdout_fd, original_stdout_fd)
+#                 os.close(saved_stdout_fd)
+#                 logger.info("Baostock logout successful.")
 
 # --- 通用数据获取函数 ---
 
@@ -107,7 +107,7 @@ def fetch_financial_data(
     
     try:
         # 使用登录上下文管理器确保API连接正常
-        with baostock_login_context():
+        # with baostock_login_context():
             # 调用传入的Baostock查询函数，所有财务数据函数都使用相同的参数格式
             rs = bs_query_func(code=code, year=year, quarter=quarter, **kwargs)
 
@@ -185,7 +185,7 @@ def fetch_index_constituent_data(
     
     try:
         # 使用登录上下文管理器确保API连接正常
-        with baostock_login_context():
+        # with baostock_login_context():
             # date参数是可选的，如果不提供则默认获取最新数据
             rs = bs_query_func(date=date, **kwargs)
 
@@ -267,7 +267,7 @@ def fetch_macro_data(
     
     try:
         # 使用登录上下文管理器确保API连接正常
-        with baostock_login_context():
+        # with baostock_login_context():
             # 调用传入的Baostock查询函数，传递时间范围和额外参数
             rs = bs_query_func(start_date=start_date,
                                end_date=end_date, **kwargs)
@@ -345,7 +345,7 @@ def fetch_generic_data(
     
     try:
         # 使用登录上下文管理器确保API连接正常
-        with baostock_login_context():
+        # with baostock_login_context():
             # 调用传入的Baostock查询函数
             rs = bs_query_func(**kwargs)
 

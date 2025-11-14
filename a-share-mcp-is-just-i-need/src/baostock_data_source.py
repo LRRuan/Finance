@@ -5,7 +5,7 @@ from typing import List, Optional, Dict  # 类型注解支持，增强代码可�
 import logging         # 日志记录模块，用于跟踪程序执行和调试
 from .data_source_interface import FinancialDataSource, DataSourceError, NoDataFoundError, LoginError
 from .utils import (
-    baostock_login_context,  # 登录上下文管理器，自动处理登录登出
+    # baostock_login_context,  # 登录上下文管理器，自动处理登录登出
     fetch_financial_data,    # 通用财务数据获取函数
     fetch_index_constituent_data,  # 通用指数成分股数据获取函数
     fetch_macro_data,        # 通用宏观经济数据获取函数
@@ -175,7 +175,8 @@ class BaostockDataSource(FinancialDataSource):
 
 
             # 使用登录上下文管理器确保API连接
-            with baostock_login_context():
+            # with baostock_login_context():
+            if 1:
                 # 调用Baostock API获取K线数据
                 rs = bs.query_history_k_data_plus(
                     code,
@@ -238,7 +239,8 @@ class BaostockDataSource(FinancialDataSource):
                 f"Requesting basic info for {code}. Optional fields requested: {fields}")
 
             # 使用登录上下文管理器
-            with baostock_login_context():
+            # with baostock_login_context():
+            if 1:
                 # 调用Baostock API获取股票基本信息
                 rs = bs.query_stock_basic(code=code)
 
