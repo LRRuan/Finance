@@ -1,6 +1,6 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from src.utils.logging_config import setup_logger, SUCCESS_ICON, ERROR_ICON, WAIT_ICON
-from src.tools.mcp_config import SERVER_CONFIGS
+from src.tools.mcp_config_http import SERVER_CONFIGS
 import asyncio  # 异步操作所需，如get_tools
 import json
 
@@ -144,7 +144,7 @@ async def _main_test_mcp_client():
 if __name__ == '__main__':
     # 这允许直接运行测试，例如：python -m src.tools.mcp_client
     # 确保您的环境已设置（例如，'uv'命令可用）。
-    # E:\github\a_share_mcp的a_share_mcp服务器应该准备好运行。
+    # mcp服务器应该准备好运行。
 
     # 如果尚未配置，为测试运行设置基本日志记录
     if not logger.hasHandlers():
