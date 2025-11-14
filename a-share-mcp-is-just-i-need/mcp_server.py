@@ -2,8 +2,8 @@
 import logging
 from datetime import datetime
 
-from mcp.server.fastmcp import FastMCP
-
+# from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 import baostock as bs
 
 # Import the interface and the concrete implementation
@@ -64,38 +64,38 @@ register_analysis_tools(app, active_data_source)
 register_news_crawler_tools(app, active_data_source)
 
 
-# def silent_login():
-#     """
-#     执行Baostock登录操作，但不向标准输出打印任何信息，以避免干扰stdio通信。
-#     返回登录结果对象。
-#     """
-#     import sys
-#     import os
-#     original_stdout = sys.stdout
-#     sys.stdout = open(os.devnull, 'w')
-#     try:
-#         lg = bs.login()
-#     finally:
-#         sys.stdout.close()
-#         sys.stdout = original_stdout
-#     return lg
-#
-#
-# def silent_logout():
-#     """
-#     执行Baostock登出操作，但不向标准输出打印任何信息，以避免干扰stdio通信。
-#     """
-#     # 我们可以通过临时重定向stdout来实现静默
-#     import sys
-#     import os
-#     original_stdout = sys.stdout
-#     sys.stdout = open(os.devnull, 'w')
-#     try:
-#         bs.logout()
-#     finally:
-#         sys.stdout.close()
-#         sys.stdout = original_stdout
-#         logging.getLogger(__name__).info("✓ Baostock global session silently logged out.")
+def silent_login():
+    """
+    执行Baostock登录操作，但不向标准输出打印任何信息，以避免干扰stdio通信。
+    返回登录结果对象。
+    """
+    import sys
+    import os
+    original_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
+    try:
+        lg = bs.login()
+    finally:
+        sys.stdout.close()
+        sys.stdout = original_stdout
+    return lg
+
+
+def silent_logout():
+    """
+    执行Baostock登出操作，但不向标准输出打印任何信息，以避免干扰stdio通信。
+    """
+    # 我们可以通过临时重定向stdout来实现静默
+    import sys
+    import os
+    original_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
+    try:
+        bs.logout()
+    finally:
+        sys.stdout.close()
+        sys.stdout = original_stdout
+        logging.getLogger(__name__).info("✓ Baostock global session silently logged out.")
 
 
 if __name__ == "__main__":
@@ -106,16 +106,20 @@ if __name__ == "__main__":
     logger.info("--- MCP Server Starting ---")
     #
     # # --- 全局 Baostock 登录逻辑 ---
-    # logger.info("Attempting global Baostock login...")
-    # # 使用silent_login来抑制baostock库的输出，避免干扰MCP的stdio通信
-    # lg = silent_login()
-    # if lg.error_code == '0':
-    #     logger.info("✓ Baostock global login successful.")
-    #     # 注册我们自定义的"安静"登出函数
-    #     atexit.register(silent_logout)
-    #     logger.info("Baostock silent logout hook registered.")
-    # else:
-    #     logger.error(f"✗ Baostock global login FAILED: {lg.error_msg}. Server will exit.")
-    #     exit(1)
+    logger.info("Attempting global Baostock login...")
+    # 使用silent_login来抑制baostock库的输出，避免干扰MCP的stdio通信
+    lg = silent_login()
+    if lg.error_code == '0':
+        logger.info("✓ Baostock global login successful.")
+        # 注册我们自定义的"安静"登出函数
+        atexit.register(silent_logout)
+        logger.info("Baostock silent logout hook registered.")
+    else:
+        logger.error(f"✗ Baostock global login FAILED: {lg.error_msg}. Server will exit.")
+        exit(1)
     # Run the server using stdio transport, suitable for MCP Hosts like Claude Desktop
-    app.run(transport='stdio')
+    # app.run(transport='stdio')
+    app.run(transport='http',
+        # host='0.0.0.0',    # 2. 监听所有网络接口，允许来自本机和其他机器的连接
+        port=8080          # 3. 指定监听的端口号
+    )
